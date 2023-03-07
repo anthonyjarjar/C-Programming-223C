@@ -10,11 +10,8 @@ int main(int argc, char *argv[]) {
   char *fileCharacters[1000];
 
   getFileData(*fileCharacters, argv[1]);
-  //printf("%s\n", *fileCharacters);
 
   computeTable(*fileCharacters);
-
-  // asciiTable();
 
   return 0;
 }
