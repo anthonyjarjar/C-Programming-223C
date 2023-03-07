@@ -2,18 +2,66 @@
 #include <stdlib.h>
 #include <string.h>
 
-void readFile(char *fileName);
+void getFileData(char *stringArr, char *fileName);
+void asciiTable();
+void computeTable(char *stringArr);
 
 int main(int argc, char *argv[]) {
+  char *fileCharacters[1000];
 
-  readFile(argv[1]);
+  getFileData(*fileCharacters, argv[1]);
+  //printf("%s\n", *fileCharacters);
+
+  computeTable(*fileCharacters);
+
+  // asciiTable();
 
   return 0;
 }
 
-void readFile(char *fileName) {
+void computeTable(char *stringArr){
+  int freq[256] = {0};
+
+  for (int idx = 0; stringArr[idx] != '\0'; idx++)
+        freq[stringArr[idx]-'\n'] += 1;
+  
+    for (int idx = 0; idx < 256; idx++)
+    {
+        if (freq[idx] != 0)
+        {
+            char char_ = '\n' + idx;
+
+            if (char_ == 10)
+              printf("\\n      |  0x%02X  | %03d  | %d \n", char_, char_, freq[idx]);
+
+            if ((char_ == 9) || (char_ == 32))
+              printf("SPACE   |  0x%02X  | %03d  | %d \n", char_, char_, freq[idx]);
+
+            if (char_ != 10 && char_ != 32 && char_ != 9)
+              printf("%c       |  0x%02X  | %03d  | %d \n", char_, char_, char_, freq[idx]);
+        }
+    }
+}
+
+void asciiTable(){
+  for (char chx = 0; chx <= 126; chx++) {
+      
+      if (chx < 32 && chx != 10)
+        printf("   |  0x%02X  | %03d \n", chx, chx);
+
+      if (chx == 10)
+        printf("\\n |  0x%02X  | %03d \n", chx, chx);
+
+      if (chx > 32 && chx != 32)
+        printf("%c  |  0x%02X  | %03d \n", chx, chx, chx);
+
+    }
+}
+
+void getFileData(char *stringArr, char *fileName) {
   FILE *ptr;
   char ch;
+  int index = 0;
   ptr = fopen(fileName, "r");
 
   if (NULL == ptr) {
@@ -24,12 +72,13 @@ void readFile(char *fileName) {
   while (!feof(ptr)) {
     ch = fgetc(ptr);
 
-    if (ch == -1)
+    if (ch < 0 || ch > 127)
       break;
 
-    printf("%c |  0x%X  | %d \n", ch, ch, ch);
-  }
+    stringArr[index] = ch;
 
-  printf("\n");
+    index++;
+  }
+  
   fclose(ptr);
 }
