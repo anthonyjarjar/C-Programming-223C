@@ -19,6 +19,9 @@ int main(int argc, char *argv[]) {
 void computeTable(char *stringArr){
   int freq[256] = {0};
 
+  printf(" Char   | HexDec | Dec  | Count \n");
+  printf("--------+--------+------+------\n");
+
   for (int idx = 0; stringArr[idx] != '\0'; idx++)
         freq[stringArr[idx]-'\n'] += 1;
   
@@ -38,6 +41,8 @@ void computeTable(char *stringArr){
               printf("%c       |  0x%02X  | %03d  | %d \n", char_, char_, char_, freq[idx]);
         }
     }
+
+    printf("\n");
 }
 
 void asciiTable(){
