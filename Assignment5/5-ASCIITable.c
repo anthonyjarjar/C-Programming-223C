@@ -2,77 +2,82 @@
 #include <stdlib.h>
 #include <string.h>
 
+char fileCharacters[1000];
+
 void getFileData(char *stringArr, char *fileName);
-void asciiTable();
-void computeTable(char *stringArr);
+void computeTable(char *stringArr, char *fileName);
 
 int main(int argc, char *argv[]) {
-  char *fileCharacters[1000];
 
-  getFileData(*fileCharacters, argv[1]);
+  if (argc == 1) {
+    printf("\nPLEAE USE '--help' FOR HELP\n\n");
+    return 1;
+  }
 
-  computeTable(*fileCharacters);
+  if (argc == 2 && !strcmp(argv[argc - 1], "--help")) {
+    printf("\nIn order to use this app you must use the following format");
+    printf("\n./main <input_file> <output_file>");
+    printf("\n");
+    printf("\nThe input file must contain a string for the app to read");
+    printf("\nThe output file must be blank for the app to write too\n\n");
+    return 1;
+  }
+
+  getFileData(fileCharacters, argv[1]);
+  computeTable(fileCharacters, argv[2]);
 
   return 0;
 }
 
-void computeTable(char *stringArr){
+void computeTable(char *stringArr, char *fileName) {
   int freq[256] = {0};
 
-  printf(" Char   | HexDec | Dec  | Count \n");
-  printf("--------+--------+------+------\n");
-
   for (int idx = 0; stringArr[idx] != '\0'; idx++)
-        freq[stringArr[idx]-'\n'] += 1;
-  
-    for (int idx = 0; idx < 256; idx++)
-    {
-        if (freq[idx] != 0)
-        {
-            char char_ = '\n' + idx;
+    freq[stringArr[idx] - '\n'] += 1;
 
-            if (char_ == 10)
-              printf("\\n      |  0x%02X  | %03d  | %d \n", char_, char_, freq[idx]);
-
-            if ((char_ == 9) || (char_ == 32))
-              printf("SPACE   |  0x%02X  | %03d  | %d \n", char_, char_, freq[idx]);
-
-            if (char_ != 10 && char_ != 32 && char_ != 9)
-              printf("%c       |  0x%02X  | %03d  | %d \n", char_, char_, char_, freq[idx]);
-        }
-    }
-
-    printf("\n");
-}
-
-void asciiTable(){
-  for (char chx = 0; chx <= 126; chx++) {
-      
-      if (chx < 32 && chx != 10)
-        printf("   |  0x%02X  | %03d \n", chx, chx);
-
-      if (chx == 10)
-        printf("\\n |  0x%02X  | %03d \n", chx, chx);
-
-      if (chx > 32 && chx != 32)
-        printf("%c  |  0x%02X  | %03d \n", chx, chx, chx);
-
-    }
-}
-
-void getFileData(char *stringArr, char *fileName) {
-  FILE *ptr;
-  char ch;
-  int index = 0;
-  ptr = fopen(fileName, "r");
-
-  if (NULL == ptr) {
-    printf("Failed to open file.\n");
+  FILE *output;
+  output = fopen("output.txt", "w+");
+  if (output == NULL) {
+    printf("Failed to open output file.\n");
     exit(-1);
   }
 
-  while (!feof(ptr)) {
-    ch = fgetc(ptr);
+  fputs(" Char   | HexDec | Dec  | Count \n", output);
+  fputs("--------+--------+------+------\n", output);
+
+  for (int idx = 0; idx < 256; idx++) {
+    if (freq[idx] != 0) {
+      char char_ = ('\n') + (idx);
+
+      if (char_ == 10)
+        fprintf(output, "\\n      |  0x%02X  | %03d  | %d \n", char_, char_,
+                freq[idx]);
+
+      if ((char_ == 9) || (char_ == 32))
+        fprintf(output, "SPACE   |  0x%02X  | %03d  | %d \n", char_, char_,
+                freq[idx]);
+
+      if (char_ != 10 && char_ != 32 && char_ != 9)
+        fprintf(output, "%c       |  0x%02X  | %03d  | %d \n", char_, char_,
+                char_, freq[idx]);
+    }
+  }
+  fclose(output);
+}
+
+void getFileData(char *stringArr, char *fileName) {
+  FILE *input;
+  char ch;
+  int index = 0;
+  input = fopen(fileName, "r");
+
+  if (input == NULL) {
+    printf("Failed to open input file.\n");
+    exit(-1);
+  }
+
+  while (!feof(input)) {
+    ch = fgetc(input);
 
     if (ch < 0 || ch > 127)
       break;
@@ -81,6 +86,6 @@ void getFileData(char *stringArr, char *fileName) {
 
     index++;
   }
-  
-  fclose(ptr);
+
+  fclose(input);
 }
