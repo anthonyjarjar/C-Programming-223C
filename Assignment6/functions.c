@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "functions.h"
 
 int newLineCount(char *input)
@@ -86,7 +87,7 @@ int wordCount(char *input)
 
     while (input[index] != NULL)
     {
-        if (((input[index - 1] < 33) && (input[index] >= 33) && (input[index] <= 126)) || (input[index + 1] == -1))
+        if (((input[index - 1] < 33) && ((input[index] >= 33) && (input[index] <= 126))) && (input[index + 1] != EOF))
         {
             count++;
         }
@@ -113,13 +114,31 @@ void frequency(char *input)
     }
 }
 
-void getFileData()
+int includes(char **arr, char *target)
+{
+    int length = 5;
+    for (int idx = 0; idx < length; idx++)
+    {
+        if (strncmp(arr[idx], target, strlen(target)) == 0)
+        {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void getFileData(char *fileName, char *flags[])
 {
     char *buffer = 0;
     long length;
-    FILE *input = fopen("test.txt", "rb");
+    FILE *input = fopen(fileName, "rb");
     int index = 0;
     char ch;
+    char *lowL = "-l";
+    char *upL = "-L";
+    char *lowW = "-w";
+    char *lowC = "-c";
 
     if (input)
     {
@@ -135,12 +154,21 @@ void getFileData()
 
     if (buffer)
     {
-        printf("\nNew Line Count: %d\n", newLineCount(buffer));
-        printf("\nByte Count: %d\n", byteCount(buffer));
-        printf("\nMaxLineLen: %d\n", maxLineLen(buffer));
-        printf("\nWord Count: %d\n", wordCount(buffer));
-        printf("\nFrequency: \n");
-        frequency(buffer);
+        if (includes(flags, lowL))
+            printf("%d ", newLineCount(buffer));
+        if (includes(flags, lowW))
+            printf("%d ", wordCount(buffer));
+        if (includes(flags, lowC))
+            printf("%d ", byteCount(buffer));
+        if (includes(flags, upL))
+            printf("%d ", maxLineLen(buffer));
+
+        // -l -w -c -L -f
+
+        bool none = (!includes(flags, lowL)) && (!includes(flags, lowW)) && (!includes(flags, lowC)) && (!includes(flags, upL));
+
+        if (none == true)
+            printf("%d %d %d ", newLineCount(buffer), wordCount(buffer), byteCount(buffer));
     }
 
     fclose(input);
