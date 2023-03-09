@@ -3,7 +3,11 @@
 #include <string.h>
 
 void getFileData();
-void computeTable(char *stringArr);
+int newLineCount(char *input);
+int byteCount(char *input);
+int maxLineLen(char *input);
+int wordCount(char *input);
+void frequency(char *input);
 
 int main(int argc, char *argv[]) {
 
@@ -12,40 +16,101 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-void computeTable(char *stringArr) {
-  int freq[26] = {0};
+int newLineCount(char *input) {
+  int count = 0;
+  int index = 0;
 
-  for (int idx = 0; stringArr[idx] != '\0'; idx++)
-    freq[stringArr[idx] - 'a'] += 1;
-
-  FILE *output;
-  output = fopen("output.txt", "w+");
-  if (output == NULL) {
-    printf("Failed to open output file.\n");
-    exit(-1);
-  }
-
-  fputs(" Char   | HexDec | Dec  | Count \n", output);
-  fputs("--------+--------+------+------\n", output);
-
-  for (int idx = 0; idx < 26; idx++) {
-    if (freq[idx] != 0) {
-      char char_ = ('a') + (idx);
-
-      if (char_ == 10)
-        fprintf(output, "\\n      |  0x%02X  | %03d  | %d \n", char_, char_,
-                freq[idx]);
-
-      if ((char_ == 9) || (char_ == 32))
-        fprintf(output, "SPACE   |  0x%02X  | %03d  | %d \n", char_, char_,
-                freq[idx]);
-
-      if (char_ != 10 && char_ != 32 && char_ != 9)
-        fprintf(output, "%c       |  0x%02X  | %03d  | %d \n", char_, char_,
-                char_, freq[idx]);
+  while(input[index] != NULL){
+    if(input[index] == '\n')
+    {
+      count++;
+      index++;
+    }
+    else
+    {
+      index++;
     }
   }
-  fclose(output);
+
+  return count;
+}
+
+int byteCount(char *input){
+  int count = 0;
+  int index = 0;
+
+  while(input[index] != NULL){
+    count++;
+    index++;
+  }
+
+  return count;
+}
+
+int maxLineLen(char *input){
+  int index = 0;
+  int currMax = 0;
+  int tempLen = 0;
+  int count = 0;
+  int count2 = 0;
+
+  while(input[index] != NULL){
+    if(input[index] == '\n'){
+      count2++;
+      if(tempLen > currMax){
+        currMax = tempLen;
+        tempLen = 0;
+        index++;
+        ++count;
+        printf("%d %d %d %d\n", count, count2, tempLen, currMax);
+      }
+      else
+      {
+        tempLen = 0;
+        index++;
+      }
+    }
+
+    if(input[index] != '\n'){
+      tempLen++;
+      index++;
+    }
+  }
+
+  if(currMax == 0 || currMax < tempLen){
+    currMax = tempLen;
+  }
+
+  return currMax;
+}
+
+int wordCount(char *input){
+  int count = 0;
+  int index = 0;
+
+  while(input[index] != NULL){
+    if(((input[index - 1] < 33) && (input[index] >= 33) && (input[index] <= 126)) || (input[index + 1] == -1)){
+      count++;
+    }
+    index++;
+  }
+
+  return count;
+}
+
+void frequency(char *input){
+  int freq[94] = {0};
+
+  for (int idx = 0; input[idx] != '\0'; idx++)
+    freq[input[idx] - '!'] += 1;
+
+  for (int idx = 0; idx < 94; idx++) {
+    if (freq[idx] != 0) {
+      char char_ = ('!') + (idx);
+      printf("%c %d\n", char_, freq[idx]);
+    }
+  }
+
 }
 
 void getFileData() {
@@ -66,10 +131,8 @@ void getFileData() {
     fclose(input);
   }
 
-  int freq[26] = {0};
-
   if (buffer) {
-    computeTable(buffer);
+    printf("%d %d\n", maxLineLen(buffer), newLineCount(buffer));
   }
 
   fclose(input);
