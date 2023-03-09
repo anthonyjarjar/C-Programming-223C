@@ -9,19 +9,22 @@ int maxLineLen(char *input);
 int wordCount(char *input);
 void frequency(char *input);
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
   getFileData();
 
   return 0;
 }
 
-int newLineCount(char *input) {
+int newLineCount(char *input)
+{
   int count = 0;
   int index = 0;
 
-  while(input[index] != NULL){
-    if(input[index] == '\n')
+  while (input[index] != NULL)
+  {
+    if (input[index] == '\n')
     {
       count++;
       index++;
@@ -35,11 +38,13 @@ int newLineCount(char *input) {
   return count;
 }
 
-int byteCount(char *input){
+int byteCount(char *input)
+{
   int count = 0;
   int index = 0;
 
-  while(input[index] != NULL){
+  while (input[index] != NULL)
+  {
     count++;
     index++;
   }
@@ -47,22 +52,21 @@ int byteCount(char *input){
   return count;
 }
 
-int maxLineLen(char *input){
+int maxLineLen(char *input)
+{
   int index = 0;
   int currMax = 0;
   int tempLen = 0;
-  int count = 0;
-  int count2 = 0;
 
-  while(input[index] != NULL){
-    if(input[index] == '\n'){
-      count2++;
-      if(tempLen > currMax){
+  while (input[index] != NULL)
+  {
+    if (input[index] == '\n')
+    {
+      if (tempLen > currMax)
+      {
         currMax = tempLen;
         tempLen = 0;
         index++;
-        ++count;
-        printf("%d %d %d %d\n", count, count2, tempLen, currMax);
       }
       else
       {
@@ -71,25 +75,33 @@ int maxLineLen(char *input){
       }
     }
 
-    if(input[index] != '\n'){
+    if (input[index] == 13)
+      index++;
+
+    if (input[index] != '\n' && input[index] != 13)
+    {
       tempLen++;
       index++;
     }
   }
 
-  if(currMax == 0 || currMax < tempLen){
+  if (currMax == 0 || currMax < tempLen)
+  {
     currMax = tempLen;
   }
 
   return currMax;
 }
 
-int wordCount(char *input){
+int wordCount(char *input)
+{
   int count = 0;
   int index = 0;
 
-  while(input[index] != NULL){
-    if(((input[index - 1] < 33) && (input[index] >= 33) && (input[index] <= 126)) || (input[index + 1] == -1)){
+  while (input[index] != NULL)
+  {
+    if (((input[index - 1] < 33) && (input[index] >= 33) && (input[index] <= 126)) || (input[index + 1] == -1))
+    {
       count++;
     }
     index++;
@@ -98,29 +110,33 @@ int wordCount(char *input){
   return count;
 }
 
-void frequency(char *input){
+void frequency(char *input)
+{
   int freq[94] = {0};
 
   for (int idx = 0; input[idx] != '\0'; idx++)
     freq[input[idx] - '!'] += 1;
 
-  for (int idx = 0; idx < 94; idx++) {
-    if (freq[idx] != 0) {
+  for (int idx = 0; idx < 94; idx++)
+  {
+    if (freq[idx] != 0)
+    {
       char char_ = ('!') + (idx);
       printf("%c %d\n", char_, freq[idx]);
     }
   }
-
 }
 
-void getFileData() {
+void getFileData()
+{
   char *buffer = 0;
   long length;
-  FILE *input = fopen("words_alpha.txt", "rb");
+  FILE *input = fopen("test.txt", "rb");
   int index = 0;
   char ch;
 
-  if (input) {
+  if (input)
+  {
     fseek(input, 0, SEEK_END);
     length = ftell(input);
     fseek(input, 0, SEEK_SET);
@@ -131,8 +147,9 @@ void getFileData() {
     fclose(input);
   }
 
-  if (buffer) {
-    printf("%d %d\n", maxLineLen(buffer), newLineCount(buffer));
+  if (buffer)
+  {
+    printf("%d\n", maxLineLen(buffer));
   }
 
   fclose(input);
