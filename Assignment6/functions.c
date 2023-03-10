@@ -135,10 +135,7 @@ void getFileData(char *fileName, char *flags[])
     FILE *input = fopen(fileName, "rb");
     int index = 0;
     char ch;
-    char *lowL = "-l";
-    char *upL = "-L";
-    char *lowW = "-w";
-    char *lowC = "-c";
+    char *listOfFlags[4] = {"-l", "-w", "-c", "-L"};
 
     if (input)
     {
@@ -154,18 +151,18 @@ void getFileData(char *fileName, char *flags[])
 
     if (buffer)
     {
-        if (includes(flags, lowL))
+        if (includes(flags, listOfFlags[0]))
             printf("%d ", newLineCount(buffer));
-        if (includes(flags, lowW))
+        if (includes(flags, listOfFlags[1]))
             printf("%d ", wordCount(buffer));
-        if (includes(flags, lowC))
+        if (includes(flags, listOfFlags[2]))
             printf("%d ", byteCount(buffer));
-        if (includes(flags, upL))
+        if (includes(flags, listOfFlags[3]))
             printf("%d ", maxLineLen(buffer));
 
         // -l -w -c -L -f
 
-        bool none = (!includes(flags, lowL)) && (!includes(flags, lowW)) && (!includes(flags, lowC)) && (!includes(flags, upL));
+        bool none = (!includes(flags, listOfFlags[0])) && (!includes(flags, listOfFlags[1])) && (!includes(flags, listOfFlags[2])) && (!includes(flags, listOfFlags[3]));
 
         if (none == true)
             printf("%d %d %d ", newLineCount(buffer), wordCount(buffer), byteCount(buffer));
