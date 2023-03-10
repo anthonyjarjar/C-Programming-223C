@@ -164,8 +164,11 @@ void getFileData(char *fileName, char *flags[])
 
         bool none = (!includes(flags, listOfFlags[0])) && (!includes(flags, listOfFlags[1])) && (!includes(flags, listOfFlags[2])) && (!includes(flags, listOfFlags[3]));
 
-        if (none == true)
+        if (none == true && !includes(flags, "-f"))
             printf("%d %d %d ", newLineCount(buffer), wordCount(buffer), byteCount(buffer));
+
+        if (includes(flags, "-f"))
+            frequency(buffer);
     }
 
     fclose(input);
