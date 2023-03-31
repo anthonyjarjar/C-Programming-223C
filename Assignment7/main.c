@@ -18,25 +18,37 @@ char* morseToString( char* inputBuf, int* errorCode);
 int main(int argc, char *argv[]) {
     legendMaker();
 
-    int errorCode;
+    int errorCode = 0;
 
     char * buffer = 0;
     long length;
     FILE *inputFile = fopen("test.txt", "rb");
 
-    if(inputFile){
-    fseek (inputFile, 0, SEEK_END);
-    length = ftell(inputFile);
-    fseek (inputFile, 0, SEEK_SET);
-    buffer = malloc (length);
-    if (buffer){
-        fread (buffer, 1, length, inputFile);
-    }
-    fclose (inputFile);
+    if (!inputFile){
+        fprintf(stderr, "Error: Something went wrong when opening the input file (code %d)\n", 1);
+        return 1;
     }
 
-    if (buffer){
-        morseToString(buffer, 0);
+    if(inputFile){
+        fseek (inputFile, 0, SEEK_END);
+        length = ftell(inputFile);
+        fseek (inputFile, 0, SEEK_SET);
+        buffer = malloc (length);
+        if (buffer){
+            fread (buffer, 1, length, inputFile);
+        }
+        fclose (inputFile);
+    }
+
+    if (!buffer){
+        fprintf(stderr, "Error: Something went wrong when opening the input file (code %d)\n", 1);
+        return 1;
+    }
+
+    stringToMorse(buffer, &errorCode);
+
+    if(errorCode != 0){
+        fprintf(stderr, "Error code: %d\n", errorCode);
     }
 
     return 0;
@@ -88,21 +100,31 @@ char *stringToMorse( char* inputBuf, int* errorCode){
             break;
         }
 
+        bool found = false;
+
         for(int idx = 0; idx < 49; idx++){            
             if(character[0] == LEGEND[idx].asciiChar[0]){
                 printf("%s ", LEGEND[idx].morsecode);
+                found = true;
                 break;
             }
 
             if(character[0] == space){
                 printf(" ");
+                found = true;
                 break;
             }
 
             if(character[0] == newline){
                 printf("  ");
+                found = true;
                 break;
             }
+        }
+
+        if(!found){
+            *errorCode = 2;
+            return 0;
         }
 
         charToTranslate++;
@@ -111,23 +133,28 @@ char *stringToMorse( char* inputBuf, int* errorCode){
 
     printf("\n");
     return 0;
-};
+}
 
 char* morseToString(char* inputBuf, int* errorCode) {
     int idx = 0;
     while (inputBuf[idx] != '\0') {
+        bool found = false;
+
         if (inputBuf[idx] == ' ') {
             if (idx + 1 < strlen(inputBuf) && inputBuf[idx + 1] == ' ') {
                 if (idx + 2 < strlen(inputBuf) && inputBuf[idx + 2] == ' ') {
                     if (idx + 3 < strlen(inputBuf) && inputBuf[idx + 3] == ' ') {
                         printf("\n\n");
+                        found = true;
                         idx += 4;
                     } else {
                         printf("\n");
+                        found = true;
                         idx += 3;
                     }
                 } else {
                     printf(" ");
+                    found = true;
                     idx += 2;
                 }
             } else {
@@ -142,9 +169,15 @@ char* morseToString(char* inputBuf, int* errorCode) {
             for (int kdx = 0; kdx < 49; kdx++) {
                 if (strcmp(morseCode, LEGEND[kdx].morsecode) == 0) {
                     printf("%c", LEGEND[kdx].asciiChar[0]);
+                    found = true;
                     break;
                 }
             }
+        }
+
+        if(!found){
+            *errorCode = 2;
+            return 0;
         }
     }
     printf("\n");
