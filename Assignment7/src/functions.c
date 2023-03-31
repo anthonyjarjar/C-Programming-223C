@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "/Users/anthonyjarjour/Desktop/C-Programming-223C/Assignment7/src/functions.h"
 
 struct codeTranslator{
     char asciiChar[2];
@@ -11,52 +12,26 @@ struct codeTranslator{
 
 struct codeTranslator LEGEND[49]; 
 
-void legendMaker();
-char *stringToMorse(char* inputBuf, int* errorCode);
-char* morseToString( char* inputBuf, int* errorCode);
-
-int main(int argc, char *argv[]) {
-    legendMaker();
-
-    int errorCode = 0;
-
-    char * buffer = 0;
-    long length;
-    FILE *inputFile = fopen("test.txt", "rb");
-
-    if (!inputFile){
-        fprintf(stderr, "Error: Something went wrong when opening the input file (code %d)\n", 1);
-        return 1;
+bool errorCheck(FILE *inputFile, char *filename){
+    if (!inputFile) {
+        printf("Error opening file %s\n", filename);
+        perror("Error");
+        return false;
     }
-
-    if(inputFile){
-        fseek (inputFile, 0, SEEK_END);
-        length = ftell(inputFile);
-        fseek (inputFile, 0, SEEK_SET);
-        buffer = malloc (length);
-        if (buffer){
-            fread (buffer, 1, length, inputFile);
-        }
-        fclose (inputFile);
-    }
-
-    if (!buffer){
-        fprintf(stderr, "Error: Something went wrong when opening the input file (code %d)\n", 1);
-        return 1;
-    }
-
-    stringToMorse(buffer, &errorCode);
-
-    if(errorCode != 0){
-        fprintf(stderr, "Error code: %d\n", errorCode);
-    }
-
-    return 0;
+    return true;
 }
 
+
 void legendMaker(){
+    char *filename = "src/txtfiles/morsecode.txt";
     FILE *morseCodeFile;
-    morseCodeFile = fopen("morsecode.txt", "r");
+
+    morseCodeFile = fopen(filename, "rb");
+    
+    if (!errorCheck(morseCodeFile, filename)) {
+        exit(1);
+    }
+
     char line[256];
     char delim[] = " ";
     int idx = 0; 
@@ -86,14 +61,43 @@ void legendMaker(){
     fclose(morseCodeFile);
 }
 
+int endsWithTXT(const char* str){
+    int len = strlen(str);
+    const char* suffix = ".txt";
+    int suffix_len = strlen(suffix);
+
+    if (len < suffix_len) {
+        return 0;
+    }
+
+    const char* end = str + len - suffix_len;
+    return (strcmp(end, suffix) == 0);
+}
+
+void commandOperators(bool *encode, bool *decode, bool *justify, bool *wrap, char **filename, int argc, char *argv[]){
+    for(int idx = 0; idx < argc; idx++){
+        if (strcmp(argv[idx], "-e") == 0){
+            *encode = true;
+        }
+        if (strcmp(argv[idx], "-d") == 0){
+            *decode = true;
+        }
+        if (endsWithTXT(argv[idx])){
+            *filename = argv[idx];
+        }
+    }
+}
+
 char *stringToMorse( char* inputBuf, int* errorCode){
     char space = ' ';
     char newline = '\n';
     int charToTranslate = 0;
+    *errorCode = 0;
 
     do
     {
-        char cdx = toupper(inputBuf[charToTranslate]);
+        char cdx = inputBuf[charToTranslate];
+        cdx = toupper(cdx);
         char *character = &cdx;
  
         if (inputBuf[charToTranslate] == '\0'){
@@ -103,10 +107,11 @@ char *stringToMorse( char* inputBuf, int* errorCode){
         bool found = false;
 
         for(int idx = 0; idx < 49; idx++){            
-            if(character[0] == LEGEND[idx].asciiChar[0]){
-                printf("%s ", LEGEND[idx].morsecode);
-                found = true;
-                break;
+            if(character[0] == LEGEND[idx].asciiChar[0] && LEGEND[idx].asciiChar[0] != 0){
+                if(LEGEND[idx].morsecode[0] != 0)    
+                    printf("%s ", LEGEND[idx].morsecode);
+                    found = true;
+                    break;
             }
 
             if(character[0] == space){
@@ -136,14 +141,15 @@ char *stringToMorse( char* inputBuf, int* errorCode){
 }
 
 char* morseToString(char* inputBuf, int* errorCode) {
+    *errorCode = 0;
     int idx = 0;
     while (inputBuf[idx] != '\0') {
         bool found = false;
 
         if (inputBuf[idx] == ' ') {
-            if (idx + 1 < strlen(inputBuf) && inputBuf[idx + 1] == ' ') {
-                if (idx + 2 < strlen(inputBuf) && inputBuf[idx + 2] == ' ') {
-                    if (idx + 3 < strlen(inputBuf) && inputBuf[idx + 3] == ' ') {
+            if (idx + 1 < (int)strlen(inputBuf) && inputBuf[idx + 1] == ' ') {
+                if (idx + 2 < (int)strlen(inputBuf) && inputBuf[idx + 2] == ' ') {
+                    if (idx + 3 < (int)strlen(inputBuf) && inputBuf[idx + 3] == ' ') {
                         printf("\n\n");
                         found = true;
                         idx += 4;
@@ -183,4 +189,3 @@ char* morseToString(char* inputBuf, int* errorCode) {
     printf("\n");
     return 0;
 }
-
