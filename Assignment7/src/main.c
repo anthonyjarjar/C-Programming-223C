@@ -7,6 +7,8 @@ int main(int argc, char *argv[]) {
     bool justify = false; 
     bool wrap = false;
     char *filename = "";
+    char *stringToMorseResult;
+    char *morseToStringResult;
 
     commandOperators(&encode, &decode, &justify, &wrap, &filename, argc, argv);
 
@@ -22,7 +24,6 @@ int main(int argc, char *argv[]) {
     char *buffer = 0;
     long length;
     FILE *inputFile;
-    // filename = "src/txtfiles/encode_this.txt";
 
     inputFile = fopen(filename, "rb");
     
@@ -49,10 +50,12 @@ int main(int argc, char *argv[]) {
     }
 
     if(encode){
-        stringToMorse(buffer, &errorCode);
+        stringToMorseResult = stringToMorse(buffer, &errorCode);
+        
     }
     if(decode){
-        morseToString(buffer, &errorCode);
+        morseToStringResult = morseToString(buffer, &errorCode);
+        printf("%s\n", morseToStringResult);
     }
 
     if(errorCode != 0){

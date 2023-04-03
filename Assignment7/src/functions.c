@@ -92,6 +92,8 @@ char *stringToMorse( char* inputBuf, int* errorCode){
     char space = ' ';
     char newline = '\n';
     int charToTranslate = 0;
+    char *result = malloc(50 * sizeof(char));
+
     *errorCode = 0;
 
     do
@@ -106,22 +108,34 @@ char *stringToMorse( char* inputBuf, int* errorCode){
 
         bool found = false;
 
-        for(int idx = 0; idx < 49; idx++){            
+        for(int idx = 0; idx < 49; idx++){     
             if(character[0] == LEGEND[idx].asciiChar[0] && LEGEND[idx].asciiChar[0] != 0){
                 if(LEGEND[idx].morsecode[0] != 0)    
-                    printf("%s ", LEGEND[idx].morsecode);
+                    result = realloc(result, (strlen(result) + strlen(LEGEND[idx].morsecode) + 1) * sizeof(char));
+                    strcat(result, LEGEND[idx].morsecode);
+                    result = realloc(result, (strlen(result) + strlen(" ") + 1) * sizeof(char));
+                    strcat(result, " ");
                     found = true;
                     break;
             }
 
             if(character[0] == space){
-                printf(" ");
+                result = realloc(result, (strlen(result) + strlen(" ") + 1) * sizeof(char));
+                strcat(result, " ");
                 found = true;
                 break;
             }
 
             if(character[0] == newline){
-                printf("  ");
+                result = realloc(result, (strlen(result) + strlen("  ") + 1) * sizeof(char));
+                strcat(result, "  ");
+                found = true;
+                break;
+            }
+
+            if(inputBuf[charToTranslate] == newline && character[0] == newline){
+                result = realloc(result, (strlen(result) + strlen("   ") + 1) * sizeof(char));
+                strcat(result, "   ");
                 found = true;
                 break;
             }
@@ -136,35 +150,44 @@ char *stringToMorse( char* inputBuf, int* errorCode){
 
     }  while(1);
 
-    printf("\n");
-    return 0;
+    return result;
 }
 
 char* morseToString(char* inputBuf, int* errorCode) {
     *errorCode = 0;
     int idx = 0;
+    char *result = malloc(50 * sizeof(char));
+
     while (inputBuf[idx] != '\0') {
         bool found = false;
 
         if (inputBuf[idx] == ' ') {
+            found = true;
             if (idx + 1 < (int)strlen(inputBuf) && inputBuf[idx + 1] == ' ') {
                 if (idx + 2 < (int)strlen(inputBuf) && inputBuf[idx + 2] == ' ') {
                     if (idx + 3 < (int)strlen(inputBuf) && inputBuf[idx + 3] == ' ') {
-                        printf("\n\n");
                         found = true;
+                        result = realloc(result, (strlen(result) + strlen("\n\n") + 1) * sizeof(char));
+                        strcat(result, "\n\n ");
                         idx += 4;
+                        continue;
                     } else {
-                        printf("\n");
                         found = true;
+                        result = realloc(result, (strlen(result) + strlen("\n") + 1) * sizeof(char));
+                        strcat(result, "\n ");
                         idx += 3;
+                        continue;
                     }
                 } else {
-                    printf(" ");
+                    result = realloc(result, (strlen(result) + strlen(" ") + 1) * sizeof(char));
+                    strcat(result, " ");
                     found = true;
                     idx += 2;
+                    continue;
                 }
             } else {
                 idx++;
+                continue;
             }
         } else {
             char morseCode[7] = {'\0'};
@@ -174,7 +197,8 @@ char* morseToString(char* inputBuf, int* errorCode) {
             }
             for (int kdx = 0; kdx < 49; kdx++) {
                 if (strcmp(morseCode, LEGEND[kdx].morsecode) == 0) {
-                    printf("%c", LEGEND[kdx].asciiChar[0]);
+                    result = realloc(result, (strlen(result) + strlen(&LEGEND[kdx].asciiChar[0]) + 1) * sizeof(char));
+                    strcat(result, &LEGEND[kdx].asciiChar[0]);
                     found = true;
                     break;
                 }
@@ -186,6 +210,6 @@ char* morseToString(char* inputBuf, int* errorCode) {
             return 0;
         }
     }
-    printf("\n");
-    return 0;
+
+    return result;
 }
