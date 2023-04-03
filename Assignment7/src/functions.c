@@ -14,7 +14,7 @@ struct codeTranslator LEGEND[49];
 
 bool errorCheck(FILE *inputFile, char *filename){
     if (!inputFile) {
-        printf("Error opening file %s\n", filename);
+        printf("Erorr opening file %s\n", filename);
         perror("Error");
         return false;
     }
@@ -74,7 +74,7 @@ int endsWithTXT(const char* str){
     return (strcmp(end, suffix) == 0);
 }
 
-void commandOperators(bool *encode, bool *decode, bool *justify, bool *wrap, char **filename, int argc, char *argv[]){
+void commandOperators(int *wrapInt, int *justifyInt, bool *encode, bool *decode, bool *justify, bool *wrap, char **filename, int argc, char *argv[]){
     for(int idx = 0; idx < argc; idx++){
         if (strcmp(argv[idx], "-e") == 0){
             *encode = true;
@@ -84,6 +84,26 @@ void commandOperators(bool *encode, bool *decode, bool *justify, bool *wrap, cha
         }
         if (endsWithTXT(argv[idx])){
             *filename = argv[idx];
+        }
+        if (strcmp(argv[idx], "-w") == 0){
+            *wrap = true;
+            if (argv[idx + 1] != NULL) {
+                char *endptr;
+                long int value = strtol(argv[idx + 1], &endptr, 10);
+                if (endptr != argv[idx + 1] && *endptr == '\0') {
+                    *wrapInt = (int)value;
+                }
+            }
+        }
+        if (strcmp(argv[idx], "-j") == 0){
+            *justify = true;
+            if (argv[idx + 1] != NULL) {
+                char *endptr;
+                long int value = strtol(argv[idx + 1], &endptr, 10);
+                if (endptr != argv[idx + 1] && *endptr == '\0') {
+                    *justifyInt = (int)value;
+                }
+            }
         }
     }
 }
@@ -161,6 +181,12 @@ char* morseToString(char* inputBuf, int* errorCode) {
     while (inputBuf[idx] != '\0') {
         bool found = false;
 
+        if(inputBuf[idx] == '\n'){
+            found = true;
+            idx++;
+            continue;
+        }
+
         if (inputBuf[idx] == ' ') {
             found = true;
             if (idx + 1 < (int)strlen(inputBuf) && inputBuf[idx + 1] == ' ') {
@@ -212,4 +238,58 @@ char* morseToString(char* inputBuf, int* errorCode) {
     }
 
     return result;
+}
+
+void justify(char *string, int max) {
+    char *word = strtok(string, " ");
+    int lineLength = 0;
+
+    while (word != NULL) {
+        int wordLength = strlen(word);
+
+        if (lineLength + wordLength > max) {
+            printf("\n");
+            lineLength = 0;
+        }
+
+        int numSpaces = (max - lineLength) / 2;
+        for (int i = 0; i < numSpaces; i++) {
+            printf(" ");
+        }
+        printf("%s", word);
+
+        lineLength += wordLength + numSpaces;
+        if (lineLength < max) {
+            printf(" ");
+            lineLength++;
+        }
+
+        word = strtok(NULL, " ");
+    }
+
+    printf("\n");
+}
+
+void wrap(char *string, int max){
+    char delim[] = " ";
+    char *ptr = strtok(string, delim);
+    int currWordLen = 0;
+    int currLineLen = 0;
+
+    while (ptr != NULL ) {
+        currWordLen = strlen(ptr);
+
+        if((currWordLen + currLineLen) > max){
+            printf("\n");
+            currLineLen = 0;
+        }
+
+        printf("%s ", ptr);
+        currLineLen = currWordLen + currLineLen;
+
+        currWordLen = 0; 
+        ptr = strtok(NULL, delim);
+    }
+
+    printf("\n");
 }

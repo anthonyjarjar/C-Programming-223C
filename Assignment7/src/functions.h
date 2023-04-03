@@ -8,7 +8,9 @@ void legendMaker();
 char *stringToMorse(char* inputBuf, int* errorCode);
 char* morseToString( char* inputBuf, int* errorCode);
 int endsWithTXT(const char* str);
-void commandOperators(bool *encode, bool *decode, bool *justify, bool *wrap, char **filename, int argc, char *argv[]);
+void commandOperators(int *wrapInt, int *justifyInt, bool *encode, bool *decode, bool *justify, bool *wrap, char **filename, int argc, char *argv[]);
 bool errorCheck(FILE *inputFile, char *filename);
+void justify(char *string, int max);
+void wrap(char *string, int max);
 
 #endif

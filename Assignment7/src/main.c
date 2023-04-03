@@ -1,16 +1,21 @@
 #include <stdlib.h>
+#include <string.h>
 #include "/Users/anthonyjarjour/Desktop/C-Programming-223C/Assignment7/src/functions.h"
 
 int main(int argc, char *argv[]) {
     bool encode = false;
     bool decode = false;
-    bool justify = false; 
-    bool wrap = false;
+    bool justifyBool = false; 
+    bool wrapBool = false;
+
     char *filename = "";
     char *stringToMorseResult;
     char *morseToStringResult;
 
-    commandOperators(&encode, &decode, &justify, &wrap, &filename, argc, argv);
+    int justifyInt = 60;
+    int wrapInt = 60;
+    
+    commandOperators(&wrapInt, &justifyInt, &encode, &decode, &justifyBool, &wrapBool, &filename, argc, argv);
 
     if(encode && decode){
         fprintf(stderr, "Error: You can only use -e OR -d (code %d)\n", 1);
@@ -52,10 +57,37 @@ int main(int argc, char *argv[]) {
     if(encode){
         stringToMorseResult = stringToMorse(buffer, &errorCode);
         
+        if(!wrapBool && !justifyBool){
+            printf("%s\n", stringToMorseResult);
+        }
+
+        if(justifyBool){
+            justify(stringToMorseResult, justifyInt);
+        }
+
+        if(wrapBool){
+            wrap(stringToMorseResult, wrapInt);
+        }
+
+        
     }
+
     if(decode){
         morseToStringResult = morseToString(buffer, &errorCode);
-        printf("%s\n", morseToStringResult);
+
+        if(!wrapBool && !justifyBool){
+            printf("%s\n", morseToStringResult);
+        }
+
+        if(justifyBool){
+            justify(morseToStringResult, justifyInt);
+        }
+
+        if(wrapBool){
+            wrap(morseToStringResult, wrapInt);
+        }
+
+        
     }
 
     if(errorCode != 0){
